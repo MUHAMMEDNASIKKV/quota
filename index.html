@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Elevate Certificate Generator</title>
+    <title>Elevate Certificate Generator (620x874)</title>
     <style>
         body {
             margin: 0;
@@ -13,7 +13,7 @@
             text-align: center;
         }
         .box {
-            max-width: 450px;
+            max-width: 400px;
             margin: auto;
             background: white;
             padding: 25px;
@@ -23,7 +23,7 @@
         h1 {
             color: #00756f;
             margin-bottom: 20px;
-            font-size: 24px;
+            font-size: 22px;
         }
         input, select {
             width: 100%;
@@ -31,7 +31,7 @@
             margin-bottom: 15px;
             border-radius: 8px;
             border: 1px solid #ccc;
-            font-size: 15px;
+            font-size: 14px;
             box-sizing: border-box;
         }
         button {
@@ -41,29 +41,25 @@
             border-radius: 10px;
             background: #00756f;
             color: white;
-            font-size: 17px;
+            font-size: 16px;
             font-weight: bold;
             cursor: pointer;
-            transition: 0.3s;
-        }
-        button:hover {
-            background: #005e59;
         }
         canvas {
             margin-top: 30px;
             max-width: 100%;
-            border-radius: 10px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            border: 1px solid #ddd;
             background: white;
+            border-radius: 8px;
         }
         #download {
             display: none;
             margin-top: 20px;
-            padding: 14px 25px;
+            padding: 12px 25px;
             background: #00756f;
             color: white;
             text-decoration: none;
-            border-radius: 10px;
+            border-radius: 8px;
             font-weight: bold;
         }
     </style>
@@ -81,22 +77,22 @@
         <option value="Higher School">Higher School</option>
     </select>
 
-    <button onclick="generate()">Generate Certificate</button>
+    <button onclick="generate()">Generate & Download</button>
 </div>
 
-<canvas id="canvas" width="1080" height="1350"></canvas>
+<canvas id="canvas" width="620" height="874"></canvas>
 <br>
-<a id="download">Download Certificate</a>
+<a id="download">Download Image</a>
 
 <script>
 function generate() {
-    const file = document.getElementById("photo").files[0];
+    const fileInput = document.getElementById("photo");
     const name = document.getElementById("name").value;
     const percentage = document.getElementById("percentage").value;
     const exam = document.getElementById("exam").value;
 
-    if (!file || !name || !percentage) {
-        alert("Please complete all fields.");
+    if (!fileInput.files[0] || !name || !percentage) {
+        alert("Please fill in all details and upload a photo.");
         return;
     }
 
@@ -104,23 +100,22 @@ function generate() {
     const ctx = canvas.getContext("2d");
 
     const frame = new Image();
-    // Logic: bg1 for Secondary, bg2 for School
     frame.src = (exam === "Higher Secondary") ? "bg1.png" : "bg2.png";
 
     frame.onload = function() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.drawImage(frame, 0, 0, 1080, 1350);
+        ctx.drawImage(frame, 0, 0, 620, 874);
 
         const userImg = new Image();
         userImg.onload = function() {
-            // PHOTO POSITIONING
-            const photoX = 394; 
-            const photoY = 460; 
-            const photoW = 292;
-            const photoH = 340;
-            const radius = 30;
+            // PHOTO POSITION: Moved slightly up (Y = 295)
+            const photoW = 168;
+            const photoH = 195;
+            const photoX = (620 - photoW) / 2; 
+            const photoY = 305; 
+            const radius = 20;
 
-            // ASPECT RATIO CALCULATION
+            // Maintain Ratio logic
             let imgW = userImg.width;
             let imgH = userImg.height;
             let aspect = imgW / imgH;
@@ -139,33 +134,29 @@ function generate() {
                 sy = (imgH - sh) / 2;
             }
 
-            // DRAW ROUNDED PHOTO
             ctx.save();
             roundedRect(ctx, photoX, photoY, photoW, photoH, radius);
             ctx.clip();
             ctx.drawImage(userImg, sx, sy, sw, sh, photoX, photoY, photoW, photoH);
             ctx.restore();
 
-            // NAME - Positioned higher (880 instead of 930)
+            // NAME: Positioned centered above text area
             ctx.fillStyle = "#0a6e69";
-            ctx.font = "bold 45px Arial";
+            ctx.font = "bold 28px Arial";
             ctx.textAlign = "center";
-            ctx.fillText(name.toUpperCase(), 540, 880);
+            ctx.fillText(name.toUpperCase(), 310, 555);
 
-            // PERCENTAGE - Positioned higher (935 instead of 985)
+            // PERCENTAGE: Positioned centered below name
             ctx.fillStyle = "#333333";
-            ctx.font = "bold 40px Arial";
-            ctx.fillText(percentage, 540, 935);
+            ctx.font = "bold 24px Arial";
+            ctx.fillText(percentage, 310, 590);
 
-            // PREPARE DOWNLOAD
             const link = document.getElementById("download");
             link.href = canvas.toDataURL("image/png");
-            link.download = name.replace(/\s+/g, '_') + "_Certificate.png";
+            link.download = name.replace(/\s+/g, '_') + "_Elevate.png";
             link.style.display = "inline-block";
-            
-            canvas.scrollIntoView({ behavior: 'smooth' });
         };
-        userImg.src = URL.createObjectURL(file);
+        userImg.src = URL.createObjectURL(fileInput.files[0]);
     };
 }
 
